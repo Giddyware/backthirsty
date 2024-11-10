@@ -18,10 +18,10 @@ const FeatureCard: React.FC<CardProps> = ({ title, description, children }) => {
       <div className="flex justify-center w-full">
         <Link
           href="#"
-          className="underline hover:no-underline flex items-center gap-1"
+          className="group flex items-center justify-center gap-1 px-6 py-3 underline hover:no-underline text-black hover:cursor-pointer hover:text-black/75"
         >
           <span>Learn more</span>
-          <ArrowUpRight className="w-4 h-4" />
+          <ArrowUpRight className="w-4 h-4 opacity-75 transition-all group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:scale-105 group-hover:text-black group-hover:opacity-100" />
         </Link>
       </div>
     </div>
