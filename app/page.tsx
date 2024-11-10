@@ -1,7 +1,9 @@
 "use client";
 
 import { CryptoPills } from "@/components/crypto/crypto-pills";
+import { DiveIntoTheFuture } from "@/components/dive-into-the-future";
 import { CardContainer } from "@/components/feature-card";
+import { GetStarted } from "@/components/get-started";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -188,7 +190,6 @@ const HeroSection = () => {
               <TabsContent value="crypto">
                 <Card className="border-none">
                   <CardHeader>
-                    <CardTitle>Crypto</CardTitle>
                     <CardDescription className="mx-auto">
                       <CryptoPills />
                     </CardDescription>
@@ -235,7 +236,7 @@ const HeroSection = () => {
 };
 const FeaturesSection = () => {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:items-center lg:gap-x-10 lg:px-8 lg:py-20">
+    <section className="mx-auto px-6 py-20 sm:py-28 lg:items-center lg:gap-x-10 lg:px-8 lg:py-20">
       <h3 className="text-center font-bold text-5xl max-w-2xl mx-auto mb-12">
         Why You Should Start Investing Now
       </h3>
@@ -249,6 +250,8 @@ export default function Home() {
     <div>
       <HeroSection />
       <FeaturesSection />
+      <GetStarted />
+      <DiveIntoTheFuture />
     </div>
   );
 }
