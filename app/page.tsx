@@ -374,7 +374,7 @@ const HeroSection = () => {
             fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)"
           />
         </svg>
-        <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-20">
+        <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-20 min-h-[780px]">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
             <h1 className="mt-10 max-w-lg text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Back Testing For Normal People
@@ -420,26 +420,26 @@ const HeroSection = () => {
                       you&rsquo;re done.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2 mx-auto">
-                    <div className="flex gap-6 flex-col">
-                      <div className="flex gap-6">
-                        <div className="space-y-1">
+                  <CardContent className="space-y-2 mx-auto w-full">
+                    <div className="flex gap-6 flex-col w-full">
+                      <div className="flex w-full gap-6">
+                        <div className="flex-1 space-y-1">
                           <Label htmlFor="ticker">Ticker</Label>
                           <Input id="ticker" placeholder="Enter ticker" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="flex-1 space-y-1">
                           <Label htmlFor="amount_invested">
                             Amount Invested
                           </Label>
                           <Input id="amount_invested" placeholder="$0.00" />
                         </div>
                       </div>
-                      <div className="flex gap-6">
-                        <div className="space-y-1">
+                      <div className="flex w-full gap-6">
+                        <div className="flex-1 space-y-1">
                           <Label htmlFor="start_date">Start Date</Label>
                           <Input id="start_date" placeholder="Select Date" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="flex-1 space-y-1">
                           <Label htmlFor="end_date">End Date</Label>
                           <Input id="end_date" placeholder="Select Date" />
                         </div>
@@ -469,18 +469,18 @@ const HeroSection = () => {
                 <Card className="border-none">
                   <CardHeader>
                     <CardTitle>Crypto</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="mx-auto">
                       <CryptoPills />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex gap-6 flex-col">
                       <div className="flex gap-6">
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <Label htmlFor="ticker">Ticker</Label>
                           <Input id="ticker" placeholder="Enter ticker" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <Label htmlFor="amount_invested">
                             Amount Invested
                           </Label>
@@ -488,11 +488,11 @@ const HeroSection = () => {
                         </div>
                       </div>
                       <div className="flex gap-6">
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <Label htmlFor="start_date">Start Date</Label>
                           <Input id="start_date" placeholder="Select Date" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1">
                           <Label htmlFor="end_date">End Date</Label>
                           <Input id="end_date" placeholder="Select Date" />
                         </div>
