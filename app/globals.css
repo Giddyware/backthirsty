@@ -74,3 +74,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+.swiper-wrapper {
+  position: relative;
+  padding-bottom: 70px;
+}
+
+.swiper-slide {
+  position: relative !important;
+  padding-top: 2rem;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  position: absolute;
+  background: #40ee70;
+  border-radius: 50%;
+  width: 40px !important;
+  height: 40px !important;
+  top: auto !important;
+  bottom: 0 !important;
+  margin-top: 0 !important;
+
+  &:hover {
+    background: #a7baac;
+  }
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px !important;
+  color: black;
+  font-weight: bold;
+}
+
+.swiper-button-prev {
+  left: 45% !important;
+}
+
+.swiper-button-next {
+  right: 45% !important;
+}
