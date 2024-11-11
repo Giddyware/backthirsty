@@ -5,14 +5,17 @@ import SwapText from "../swap-text";
 export const GetStarted = () => {
   return (
     <section className="mx-auto px-6 py-20 flex sm:py-28 gap-24 lg:px-20 lg:py-20">
-      <Image
-        src="/get-started.png"
-        className=""
-        alt="get-started"
-        height={420}
-        width={490}
-      />
-      <div className="space-y-7">
+      <div className="flex-1">
+        <Image
+          src="/get-started.png"
+          className=""
+          alt="get-started"
+          height={420}
+          width={490}
+        />
+      </div>
+
+      <div className="space-y-7 flex-1">
         <h3 className="font-bold text-left text-5xl max-w-xl mx-auto mb-12">
           Get Started with the Right Investment
         </h3>
