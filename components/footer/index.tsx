@@ -14,14 +14,17 @@ export const Footer: React.FC<FooterProps> = ({ navigation }) => {
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
-            <Image
-              className="h-8 w-auto"
-              src="/logo.png"
-              alt=""
-              width={32}
-              height={32}
-            />
-            <span className="text-white">BackThirsty</span>
+            <div className="flex gap-2 items-center">
+              <Image
+                className="h-8 w-auto"
+                src="/logo.png"
+                alt=""
+                width={32}
+                height={32}
+              />
+              <span className="text-white font-bold text-2xl">BackThirsty</span>
+            </div>
+
             <p className="text-sm leading-6 text-[#D5D5D5]">
               Back Thirsty allows you to calculate potential returns on past
               investments in stocks and cryptocurrencies.
@@ -116,7 +119,7 @@ export const Footer: React.FC<FooterProps> = ({ navigation }) => {
             </div>
           </div>
         </div>
-        <div className="mt-16 border-t border-[#F1F1F1]/80/10 pt-8 sm:mt-20 lg:mt-24">
+        <div className="mt-16 border-t border-white/15 pt-8 sm:mt-20 lg:mt-24">
           <p className="text-xs leading-5 text-gray-500">
             &copy; 2020 Your Company, Inc. All rights reserved.
           </p>

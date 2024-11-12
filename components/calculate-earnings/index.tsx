@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export const CalculateEarnings = () => {
   return (
-    <section className="mx-auto px-6 py-20 flex sm:py-28 gap-24 lg:px-20 lg:py-20">
+    <section className="mx-auto px-6 py-20 flex flex-col md:flex-row sm:py-28 lg:gap-x-24 lg:px-20 lg:py-20">
       <div className="flex-1">
         <Image
           src="/calculator.png"
@@ -13,7 +13,7 @@ export const CalculateEarnings = () => {
         />
       </div>
       <div className="space-y-7 flex-1">
-        <h3 className="font-bold text-left text-5xl max-w-xl mx-auto mb-12">
+        <h3 className="font-bold text-left text-2xl lg:text-5xl max-w-xl mx-auto mb-12">
           Calculate Now and Discover Your Potential Earnings
         </h3>
 

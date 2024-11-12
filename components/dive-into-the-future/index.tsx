@@ -3,9 +3,9 @@ import { Button } from "../ui/button";
 
 export const DiveIntoTheFuture = () => {
   return (
-    <section className="mx-auto px-6 py-20 flex sm:py-28 gap-24 lg:px-20 lg:py-20">
+    <section className="mx-auto px-6 py-20 flex flex-col md:flex-row sm:py-28 lg:gap-x-24 lg:px-20 lg:py-20">
       <div className="flex-1 flex flex-col">
-        <h3 className="font-bold text-[3.375rem] max-w-[500px] leading-[64.8px] mb-2">
+        <h3 className="font-bold text-[26px] lg:text-[3.375rem] lg:max-w-[500px] leading-[31.2px] lg:leading-[64.8px] mb-2">
           Dive into the Future with Crypto Investments
         </h3>
         <p className="text-[#7A7A7A] max-w-[450px] text-[24px] leading-[29.04px]">

@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
 import { A11y, Autoplay, Navigation, Scrollbar } from "swiper/modules";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import Image from "next/image";
 import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/navigation";
@@ -94,10 +95,20 @@ export const Testimonial = () => {
               </div>
               <div className="px-8 py-11 flex flex-col bg-white rounded-lg shadow-lg h-60">
                 <p className="text-gray-600">{testimonial.quote}</p>
-                <div className="mt-auto">
-                  <div className="font-semibold">{testimonial.name}</div>
-                  <div className="text-sm text-gray-500">
-                    {testimonial.title}
+
+                <div className="flex gap-4">
+                  <Image
+                    src="/testimonial/1.png"
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                    className="rounded-full mt-6"
+                  />
+                  <div className="mt-auto">
+                    <div className="font-semibold">{testimonial.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {testimonial.title}
+                    </div>
                   </div>
                 </div>
               </div>

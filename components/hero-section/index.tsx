@@ -36,7 +36,7 @@ export const HeroSection = () => {
               width={32}
               height={32}
             />
-            <span className="text-white">BackThirsty</span>
+            <span className="text-white font-bold text-2xl">BackThirsty</span>
             {/* </a> */}
           </div>
           <div className="flex lg:hidden">
