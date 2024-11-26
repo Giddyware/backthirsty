@@ -110,8 +110,15 @@
 
 .swiper-button-prev {
   left: 45% !important;
+  @media (max-width: 768px) {
+    left: 30% !important;
+  }
 }
 
 .swiper-button-next {
   right: 45% !important;
+  @media (max-width: 768px) {
+    right: 30% !important;
+  }
+
 }

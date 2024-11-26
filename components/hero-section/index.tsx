@@ -36,7 +36,7 @@ export const HeroSection = () => {
               width={32}
               height={32}
             />
-            <span className="text-white">BackThirsty</span>
+            <span className="text-white font-bold text-2xl">BackThirsty</span>
             {/* </a> */}
           </div>
           <div className="flex lg:hidden">
@@ -94,11 +94,11 @@ export const HeroSection = () => {
           />
         </svg>
         <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-20 min-h-[780px]">
-          <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
-            <h1 className="mt-10 max-w-lg text-4xl font-bold tracking-tight text-white sm:text-6xl">
+          <div className="mx-auto max-w-4xl lg:mx-0 lg:flex-1">
+            <h1 className="mt-10 max-w-lg text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-white">
               Back Testing For Normal People
             </h1>
-            <p className="mt-6 text-lg leading-8 text-white max-w-[542px]">
+            <p className="mt-6 text-base md:text-lg lg:text-xl leading-8 text-white max-w-[542px]">
               See how much you could have made with past investments in stocks
               and cryptocurrency
             </p>
@@ -111,10 +111,10 @@ export const HeroSection = () => {
               </a>
             </div>
           </div>
-          <div className="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+          <div className="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow w-full lg:flex-1">
             <Tabs
               defaultValue="stocks"
-              className="w-[523px] rounded-[9px] bg-white pt-6 mx-auto"
+              className="w-full lg:w-[523px] rounded-[9px] bg-white pt-6 mx-auto"
             >
               <TabsList className="grid max-w-[368px] gap-3 bg-[#F0F0F0] rounded-[10px] p-[2.3px] mx-auto grid-cols-2">
                 <TabsTrigger

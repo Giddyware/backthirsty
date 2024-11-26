@@ -4,7 +4,7 @@ import SwapText from "../swap-text";
 
 export const GetStarted = () => {
   return (
-    <section className="mx-auto px-6 py-20 flex sm:py-28 gap-24 lg:px-20 lg:py-20">
+    <section className="mx-auto px-6 py-20 flex flex-col md:flex-row sm:py-28 lg:gap-x-24 lg:px-20 lg:py-20 space-y-10 md:space-y-0">
       <div className="flex-1">
         <Image
           src="/get-started.png"
@@ -16,7 +16,7 @@ export const GetStarted = () => {
       </div>
 
       <div className="space-y-7 flex-1">
-        <h3 className="font-bold text-left text-5xl max-w-xl mx-auto mb-12">
+        <h3 className="font-bold text-2xl md:text-3xl lg:text-[3.375rem] lg:max-w-[500px] leading-8 md:leading-10 lg:leading-[64.8px] mb-2">
           Get Started with the Right Investment
         </h3>
 
@@ -24,13 +24,17 @@ export const GetStarted = () => {
           <SwapText
             initialContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Increase Value for Money</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Increase Value for Money
+                </span>
                 <ArrowUpRight className="w-12 h-12" />
               </div>
             }
             finalContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Increase Value for Money</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Increase Value for Money
+                </span>
                 <ArrowUpRight className="w-12 h-12 ml-[90px]" />
               </div>
             }
@@ -39,13 +43,17 @@ export const GetStarted = () => {
           <SwapText
             initialContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Achieving Financial Freedom</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Achieving Financial Freedom
+                </span>
                 <ArrowUpRight className="w-12 h-12" />
               </div>
             }
             finalContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Achieving Financial Freedom</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Achieving Financial Freedom
+                </span>
                 <ArrowUpRight className="w-12 h-12 ml-10" />
               </div>
             }
@@ -54,13 +62,17 @@ export const GetStarted = () => {
           <SwapText
             initialContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Market Knowledge</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Market Knowledge
+                </span>
                 <ArrowUpRight className="w-12 h-12" />
               </div>
             }
             finalContent={
               <div className="flex justify-between items-center w-full">
-                <span className="text-4xl">Market Knowledge</span>
+                <span className="text-lg md:text-xl lg:text-4xl">
+                  Market Knowledge
+                </span>
                 <ArrowUpRight className="w-12 h-12 ml-[210px]" />
               </div>
             }
