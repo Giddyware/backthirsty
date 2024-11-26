@@ -58,25 +58,39 @@ const testimonials: Testimonial[] = [
 
 export const Testimonial = () => {
   return (
-    <section className="bg-[#0D1B1A] py-16">
-      <h3 className="text-center font-bold text-5xl text-white mx-auto mb-12">
+    <section className="bg-[#0D1B1A] py-8 md:py-16">
+      <h3 className="text-center font-bold text-3xl md:text-4xl lg:text-5xl text-white mx-auto mb-8 md:mb-12">
         What Investors have been saying
       </h3>
-      <div className="px-20 py-8">
+      <div className="px-4 md:px-20 py-4 md:py-8">
         <Swiper
           modules={[Scrollbar, Autoplay, A11y, Navigation]}
-          slidesPerView={2.5}
-          spaceBetween={30}
+          slidesPerView={1}
+          spaceBetween={10}
+          breakpoints={{
+            640: {
+              slidesPerView: 1.5,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: 2.5,
+              spaceBetween: 30,
+            },
+          }}
           loop={true}
           navigation
           autoplay={true}
         >
           {testimonials.map((testimonial, index) => (
             <SwiperSlide key={index}>
-              <div className="absolute left-8 top-0">
+              <div className="absolute left-4 md:left-8 top-0">
                 <svg
-                  width="64"
-                  height="64"
+                  width="48"
+                  height="48"
                   viewBox="0 0 64 64"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -93,8 +107,8 @@ export const Testimonial = () => {
                   />
                 </svg>
               </div>
-              <div className="px-8 py-11 flex flex-col bg-white rounded-lg shadow-lg h-60">
-                <p className="text-gray-600">{testimonial.quote}</p>
+              <div className="px-4 md:px-8 py-6 md:py-11 flex flex-col bg-white rounded-lg shadow-lg h-60">
+                <p className="text-gray-600 text-sm md:text-base lg:text-lg lg:line-clamp-4">{testimonial.quote}</p>
 
                 <div className="flex gap-4">
                   <Image
@@ -105,10 +119,8 @@ export const Testimonial = () => {
                     className="rounded-full mt-6"
                   />
                   <div className="mt-auto">
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500">
-                      {testimonial.title}
-                    </div>
+                    <div className="font-semibold text-sm md:text-base lg:text-lg">{testimonial.name}</div>
+                    <div className="text-xs md:text-sm text-gray-500">{testimonial.title}</div>
                   </div>
                 </div>
               </div>
