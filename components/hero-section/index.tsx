@@ -1,8 +1,8 @@
 "use client";
 
-import { Navigation } from "../navigation";
 import { BackgroundPattern } from "../background-pattern";
 import { CalculatorTabs } from "../calculator/calculator-tabs";
+import { Navigation } from "../navigation";
 
 export const HeroSection = () => {
   return (
