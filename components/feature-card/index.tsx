@@ -61,4 +61,8 @@ export const CardContainer: React.FC = () => {
   );
 };
 
+export { FeatureCard } from './feature-card';
+export { FEATURES } from './constants';
+export type { Feature, FeatureCardProps } from './types';
+
 export default FeatureCard;
