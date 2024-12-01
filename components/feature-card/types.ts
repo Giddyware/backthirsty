@@ -1,12 +1,10 @@
-export interface FeatureCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  href?: string;
-}
+import { ReactNode } from 'react';
 
 export interface Feature {
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
+  href?: string;
 }
+
+export type FeatureCardProps = Feature;
