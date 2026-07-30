@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BackThirsty
 
-## Getting Started
+Backtesting for normal people — see what a past investment in a stock or
+cryptocurrency would be worth today.
 
-First, run the development server:
+Live at [backthirsty.vercel.app](https://backthirsty.vercel.app/).
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cp .env.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The dev server runs on **port 3001** (not 3000): http://localhost:3001
 
-## Learn More
+Nothing in `.env.local` is required to render the marketing page. Each variable
+gates one feature and, when missing, fails with an error naming both the
+variable and what it unlocks. See `.env.example` for the full list and where to
+get each key.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Dev server on port 3001 |
+| `pnpm build` | Production build (also typechecks) |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test` | Vitest, once |
+| `pnpm test:watch` | Vitest, watch mode |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Testing
 
-## Deploy on Vercel
+Tests run under Vitest. Pure logic (pricing math, env, provider parsers) runs in
+the `node` environment; component tests opt into jsdom with a
+`@vitest-environment jsdom` docblock, so most of the suite pays no DOM cost.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Tests never hit a live data provider.** `MARKET_DATA_MODE` is forced to
+`fixtures` in `vitest.config.ts`, which serves canned provider responses. This
+is not only for speed — Alpha Vantage's free tier is 25 requests per *day*, and
+a single watch-mode run against live data would exhaust it.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Never point a load test, a watch-mode run, or CI at `MARKET_DATA_MODE=live`.
+
+## Data providers and their free-tier limits
+
+Each provider does only what it is verifiably good at on a free tier. The
+constraints below are load-bearing, not incidental.
+
+| Provider | Free limit | Role |
+|---|---|---|
+| Alpha Vantage | 25/day | Stock backtest math — `TIME_SERIES_MONTHLY_ADJUSTED` |
+| Coinbase Exchange | keyless, unmetered | Crypto backtests and charts (deep history) |
+| Twelve Data | 800/day, 8/min | Stock display charts; crypto Coinbase doesn't list |
+| Finnhub | 60/min | Live US quotes, news, profiles, basic financials |
+| CoinGecko | 100/min, 10k/mo | Crypto catalog and metadata |
+
+Things worth knowing before changing the data layer:
+
+- **Stock backtests are month-end granularity.** No free provider offers
+  *adjusted* daily closes — Alpha Vantage's `DAILY_ADJUSTED` is premium, and
+  Twelve Data requires client-side adjustment via `/splits` + `/dividends`.
+  Unadjusted data yields wrong long-run returns, so the monthly adjusted series
+  is the only correct free option. Results surface the resolved dates, because a
+  request for Jan 5 → Mar 15 actually resolves to Jan 31 → Feb 29.
+- **Alpha Vantage signals throttling with HTTP 200** and an `Information` key,
+  not an error status. Detect it explicitly, or a quota problem looks to the
+  user like a bad ticker.
+- **`symbol=IBM&apikey=demo` works unmetered forever** — the free stocks smoke
+  test. `symbol=AAPL&apikey=demo` returns the throttle payload, which is the
+  free way to exercise the rate-limit path.
+- **CoinGecko's free plan caps history at 365 days**, plan-wide. It cannot power
+  backtests.
+- **Finnhub's free tier excludes historical OHLC** (403). It cannot power charts.
+- Free market-data tiers generally prohibit commercial redistribution, and
+  publicly displaying real-time exchange data can carry licensing obligations.
+
+## Stack
+
+Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · shadcn/ui on
+Radix primitives · react-hook-form + zod · Vitest.
+
+Font is [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque)
+via `next/font`, wired to the `--font-sans` variable that `tailwind.config.ts`
+expects.
+
+## Notes
+
+- `next` must stay at 14.2.35 or later: versions below 14.2.25 carry
+  CVE-2025-29927, a middleware authorization bypass. Middleware is therefore
+  treated as UX only, never as a security boundary.
+- This is not investment advice. Past performance does not indicate future
+  results.
