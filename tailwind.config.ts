@@ -19,6 +19,18 @@ const config = {
     },
     extend: {
       colors: {
+        // Brand palette. These hex values are currently repeated inline across
+        // ~12 components; new work should use these tokens instead, and the
+        // inline occurrences get migrated as each component is touched.
+        brand: {
+          DEFAULT: "#40EE70", // primary green (CTAs, accents)
+          600: "#14A83C", // darker green (active states)
+        },
+        ink: {
+          DEFAULT: "#0D1B1A", // near-black section background
+          muted: "#7A7A7A", // secondary body text
+          subtle: "#838383", // tertiary body text
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
