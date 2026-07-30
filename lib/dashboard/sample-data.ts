@@ -1,4 +1,9 @@
-import type { BacktestLeg, DashboardData, SeriesPoint } from "./types";
+import type {
+  BacktestLeg,
+  BacktestSummary,
+  DashboardData,
+  SeriesPoint,
+} from "./types";
 
 /**
  * Sample data used while the database and price providers are being built.
@@ -7,9 +12,11 @@ import type { BacktestLeg, DashboardData, SeriesPoint } from "./types";
  * <SampleDataNotice />, so they are never presented as real prices, holdings or
  * results. Delete this file once the data layer lands.
  *
- * Values are round and unremarkable on purpose so they cannot be mistaken for
- * a live quote, while still being internally consistent — totals, returns and
- * contributions all add up, so the UI's arithmetic is genuinely exercised.
+ * Everything is *derived* rather than hand-written: totals come from the legs,
+ * CAGR comes from the totals, and the chart's endpoints come from the stated
+ * period. Hand-picking both sides let the per-leg contributions sum to 172% of
+ * the total profit, which would have shown a breakdown table that does not
+ * reconcile — see sample-data.test.ts.
  */
 
 const asOf = "2026-07-30T15:45:00.000Z";
@@ -19,84 +26,160 @@ function quote(price: number, changePct: number, delayed = false) {
   return { price, change, changePct, asOf, delayed };
 }
 
+// --- date helpers ---------------------------------------------------------
+
+/** Month-end date `offset` months after the month of `from`. */
+function monthEnd(from: string, offset: number): string {
+  const base = new Date(`${from}T00:00:00Z`);
+  // Day 0 of the following month is the last day of the target month.
+  const d = new Date(
+    Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + offset + 1, 0)
+  );
+  return d.toISOString().slice(0, 10);
+}
+
+function monthsBetween(from: string, to: string): number {
+  const a = new Date(`${from}T00:00:00Z`);
+  const b = new Date(`${to}T00:00:00Z`);
+  return (
+    (b.getUTCFullYear() - a.getUTCFullYear()) * 12 +
+    (b.getUTCMonth() - a.getUTCMonth())
+  );
+}
+
 /**
- * Builds a monthly series from `from` to `to` following a smooth curve with a
- * mid-period drawdown, so charts show a realistic shape rather than a
- * straight line.
+ * Month-end series between two dates following a smooth curve with a mid-period
+ * drawdown, so charts show a realistic shape rather than a straight line.
+ *
+ * Takes the actual start/end dates rather than years, so the chart axis always
+ * agrees with the period in the page header.
  */
 function series(
-  startYear: number,
-  endYear: number,
+  startDate: string,
+  endDate: string,
   startValue: number,
   endValue: number,
-  drawdown = 0.25
+  drawdown: number
 ): SeriesPoint[] {
-  const months = (endYear - startYear) * 12;
+  const months = monthsBetween(startDate, endDate);
+  if (months <= 0) return [];
+
   const step = Math.max(1, Math.round(months / 24)); // ~24 points
   const points: SeriesPoint[] = [];
 
   for (let m = 0; m <= months; m += step) {
     const t = m / months;
-    // Exponential growth path between the two endpoints.
     const growth = startValue * Math.pow(endValue / startValue, t);
-    // A dip centred around 55% through the period.
     const dip = 1 - drawdown * Math.exp(-Math.pow((t - 0.55) / 0.12, 2));
-    // Mild deterministic ripple so it doesn't look synthetic-smooth.
     const ripple = 1 + 0.035 * Math.sin(m / 2.2);
 
-    const date = new Date(Date.UTC(startYear, m, 1));
-    // Snap to month-end: stock prices are month-end closes.
-    date.setUTCMonth(date.getUTCMonth() + 1);
-    date.setUTCDate(0);
-
     points.push({
-      date: date.toISOString().slice(0, 10),
+      date: monthEnd(startDate, m),
       value: Number((growth * dip * ripple).toFixed(2)),
     });
   }
 
-  // Force the final point to the stated end value so the chart agrees with the
-  // headline figure.
-  if (points.length) {
-    points[points.length - 1] = {
-      date: `${endYear}-01-31`,
-      value: endValue,
-    };
+  // Pin both endpoints to the stated figures.
+  points[0] = { date: startDate, value: startValue };
+  const last = points.length - 1;
+  if (points[last].date !== endDate) {
+    points.push({ date: endDate, value: endValue });
+  } else {
+    points[last] = { date: endDate, value: endValue };
   }
 
   return points;
 }
 
-function leg(
-  symbol: string,
-  name: string,
-  assetClass: BacktestLeg["assetClass"],
-  weightPct: number,
-  initialAmount: number,
-  startPrice: number,
-  endPrice: number,
-  totalProfit: number
-): BacktestLeg {
-  const startValue = (initialAmount * weightPct) / 100;
-  const units = startValue / startPrice;
-  const endValue = units * endPrice;
-  const profit = endValue - startValue;
+// --- backtest builder -----------------------------------------------------
+
+type LegSpec = {
+  symbol: string;
+  name: string;
+  assetClass: BacktestLeg["assetClass"];
+  weightPct: number;
+  startPrice: number;
+  endPrice: number;
+};
+
+/**
+ * Builds a complete backtest from its inputs, deriving every output.
+ * Guarantees by construction that legs, totals and contributions reconcile.
+ */
+function backtest(input: {
+  id: string;
+  name: string;
+  initialAmount: number;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  rebalance: NonNullable<BacktestSummary["rebalance"]>;
+  maxDrawdownPct: number;
+  legs: LegSpec[];
+}): BacktestSummary {
+  const { initialAmount, startDate, endDate } = input;
+
+  const partial = input.legs.map((spec) => {
+    const startValue = (initialAmount * spec.weightPct) / 100;
+    const units = startValue / spec.startPrice;
+    const endValue = units * spec.endPrice;
+    return { spec, startValue, units, endValue, profit: endValue - startValue };
+  });
+
+  const finalAmount = partial.reduce((sum, l) => sum + l.endValue, 0);
+  const profit = finalAmount - initialAmount;
+
+  const legs: BacktestLeg[] = partial.map((l) => ({
+    symbol: l.spec.symbol,
+    name: l.spec.name,
+    assetClass: l.spec.assetClass,
+    weightPct: l.spec.weightPct,
+    startPrice: l.spec.startPrice,
+    endPrice: l.spec.endPrice,
+    units: Number(l.units.toFixed(6)),
+    startValue: Number(l.startValue.toFixed(2)),
+    endValue: Number(l.endValue.toFixed(2)),
+    returnPct: Number(((l.profit / l.startValue) * 100).toFixed(2)),
+    contributionToProfit:
+      profit === 0 ? 0 : Number(((l.profit / profit) * 100).toFixed(1)),
+  }));
+
+  const years = monthsBetween(startDate, endDate) / 12;
+  const cagrPct =
+    years < 1
+      ? null
+      : Number(
+          ((Math.pow(finalAmount / initialAmount, 1 / years) - 1) * 100).toFixed(
+            2
+          )
+        );
 
   return {
-    symbol,
-    name,
-    assetClass,
-    weightPct,
-    startPrice,
-    endPrice,
-    units: Number(units.toFixed(6)),
-    startValue: Number(startValue.toFixed(2)),
-    endValue: Number(endValue.toFixed(2)),
-    returnPct: Number(((profit / startValue) * 100).toFixed(2)),
-    contributionToProfit:
-      totalProfit === 0 ? 0 : Number(((profit / totalProfit) * 100).toFixed(1)),
+    id: input.id,
+    name: input.name,
+    symbols: legs.map((l) => l.symbol),
+    initialAmount,
+    finalAmount: Number(finalAmount.toFixed(2)),
+    profit: Number(profit.toFixed(2)),
+    totalReturnPct: Number(((profit / initialAmount) * 100).toFixed(2)),
+    startDate,
+    endDate,
+    createdAt: input.createdAt,
+    cagrPct,
+    maxDrawdownPct: input.maxDrawdownPct,
+    rebalance: input.rebalance,
+    series: series(
+      startDate,
+      endDate,
+      initialAmount,
+      Number(finalAmount.toFixed(2)),
+      input.maxDrawdownPct / 100
+    ),
+    legs,
   };
 }
+
+// --- data -----------------------------------------------------------------
 
 export const SAMPLE_DASHBOARD: DashboardData = {
   watchlists: [
@@ -211,83 +294,110 @@ export const SAMPLE_DASHBOARD: DashboardData = {
   ],
 
   backtests: [
-    {
+    backtest({
       id: "bt_1",
       name: "$1,000 in Apple, 2015–2025",
-      symbols: ["AAPL"],
       initialAmount: 1000,
-      finalAmount: 6420,
-      profit: 5420,
-      totalReturnPct: 542,
       startDate: "2015-01-31",
       endDate: "2025-01-31",
       createdAt: "2026-07-28T09:12:00.000Z",
-      cagrPct: 20.47,
-      maxDrawdownPct: 31.4,
       rebalance: "none",
-      series: series(2015, 2025, 1000, 6420, 0.22),
+      maxDrawdownPct: 31.4,
       legs: [
-        leg("AAPL", "Apple Inc.", "stock", 100, 1000, 27.33, 175.44, 5420),
+        {
+          symbol: "AAPL",
+          name: "Apple Inc.",
+          assetClass: "stock",
+          weightPct: 100,
+          startPrice: 27.33,
+          endPrice: 175.44,
+        },
       ],
-    },
-    {
+    }),
+    backtest({
       id: "bt_2",
       name: "60/40 stocks and Bitcoin",
-      symbols: ["SPY", "BTC"],
       initialAmount: 5000,
-      finalAmount: 11875,
-      profit: 6875,
-      totalReturnPct: 137.5,
       startDate: "2019-06-30",
       endDate: "2025-06-30",
       createdAt: "2026-07-26T17:40:00.000Z",
-      cagrPct: 15.51,
-      maxDrawdownPct: 27.8,
       rebalance: "annual",
-      series: series(2019, 2025, 5000, 11875, 0.28),
+      maxDrawdownPct: 27.8,
       legs: [
-        leg("SPY", "SPDR S&P 500 ETF Trust", "etf", 60, 5000, 293.0, 545.0, 6875),
-        leg("BTC", "Bitcoin", "crypto", 40, 5000, 10800, 61000, 6875),
+        {
+          symbol: "SPY",
+          name: "SPDR S&P 500 ETF Trust",
+          assetClass: "etf",
+          weightPct: 60,
+          startPrice: 293,
+          endPrice: 545,
+        },
+        {
+          symbol: "BTC",
+          name: "Bitcoin",
+          assetClass: "crypto",
+          weightPct: 40,
+          startPrice: 10800,
+          endPrice: 61000,
+        },
       ],
-    },
-    {
+    }),
+    backtest({
       id: "bt_3",
       name: "Bitcoin since 2016",
-      symbols: ["BTC"],
       initialAmount: 1000,
-      finalAmount: 148000,
-      profit: 147000,
-      totalReturnPct: 14700,
       startDate: "2016-01-31",
       endDate: "2025-12-31",
       createdAt: "2026-07-20T11:05:00.000Z",
-      cagrPct: 65.32,
-      maxDrawdownPct: 76.2,
       rebalance: "none",
-      series: series(2016, 2025, 1000, 148000, 0.35),
-      legs: [leg("BTC", "Bitcoin", "crypto", 100, 1000, 368.0, 54464.0, 147000)],
-    },
-    {
+      maxDrawdownPct: 76.2,
+      legs: [
+        {
+          symbol: "BTC",
+          name: "Bitcoin",
+          assetClass: "crypto",
+          weightPct: 100,
+          startPrice: 368,
+          endPrice: 54464,
+        },
+      ],
+    }),
+    backtest({
       id: "bt_4",
       name: "Equal-weight tech basket",
-      symbols: ["AAPL", "QQQ", "SPY"],
       initialAmount: 10000,
-      finalAmount: 24300,
-      profit: 14300,
-      totalReturnPct: 143,
       startDate: "2018-01-31",
       endDate: "2025-01-31",
       createdAt: "2026-07-15T08:22:00.000Z",
-      cagrPct: 13.5,
-      maxDrawdownPct: 24.1,
       rebalance: "quarterly",
-      series: series(2018, 2025, 10000, 24300, 0.24),
+      maxDrawdownPct: 24.1,
       legs: [
-        leg("AAPL", "Apple Inc.", "stock", 34, 10000, 41.9, 175.44, 14300),
-        leg("QQQ", "Invesco QQQ Trust", "etf", 33, 10000, 154.0, 425.0, 14300),
-        leg("SPY", "SPDR S&P 500 ETF Trust", "etf", 33, 10000, 261.0, 545.0, 14300),
+        {
+          symbol: "AAPL",
+          name: "Apple Inc.",
+          assetClass: "stock",
+          weightPct: 34,
+          startPrice: 41.9,
+          endPrice: 175.44,
+        },
+        {
+          symbol: "QQQ",
+          name: "Invesco QQQ Trust",
+          assetClass: "etf",
+          weightPct: 33,
+          startPrice: 154,
+          endPrice: 425,
+        },
+        {
+          symbol: "SPY",
+          name: "SPDR S&P 500 ETF Trust",
+          assetClass: "etf",
+          weightPct: 33,
+          startPrice: 261,
+          endPrice: 545,
+        },
       ],
-    },
+    }),
   ],
 
   news: [
