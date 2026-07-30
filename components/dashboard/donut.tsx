@@ -81,11 +81,13 @@ export const Donut = ({ slices }: { slices: DonutSlice[] }) => {
                 style={{ backgroundColor: COLORS[i % COLORS.length] }}
                 aria-hidden="true"
               />
-              <span className="truncate font-medium text-slate-900">
+              {/* The symbol must never truncate — it is the identifier.
+                  The company name is the part that gives way. */}
+              <span className="shrink-0 font-medium text-slate-900">
                 {slice.label}
               </span>
               {slice.sublabel ? (
-                <span className="truncate text-xs text-slate-500">
+                <span className="hidden truncate text-xs text-slate-500 sm:inline">
                   {slice.sublabel}
                 </span>
               ) : null}
