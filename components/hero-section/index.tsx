@@ -2,12 +2,13 @@
 
 import { BackgroundPattern } from "../background-pattern";
 import { CalculatorTabs } from "../calculator/calculator-tabs";
-import { Navigation } from "../navigation";
 
+// The site header used to be rendered here, which is why it appeared only on
+// the landing page. It now lives in app/(marketing)/layout.tsx so every public
+// page gets it.
 export const HeroSection = () => {
   return (
     <div className="relative">
-      <Navigation />
       <div className="relative isolate pt-14 bg-[#0D1B1A] overflow-y-hidden">
         <BackgroundPattern />
         <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-20 min-h-[780px]">
